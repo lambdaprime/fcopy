@@ -1,0 +1,77 @@
+/**
+ * gradle clean build
+ */
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+ 
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+}
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+def releaseDir = "release/${projectName}/${projectName}"
+
+jar { 
+    manifest { 
+        attributes 'Implementation-Version': "${rootProject.version}",
+                   'Main-Class': 'id.fcopy.FCopyApp', 
+                   'Class-Path': configurations.compile.collect { it.getName() }.join(' ')
+    }
+}
+
+compileJava {
+    doFirst {
+        options.compilerArgs = [
+            '--module-path', classpath.asPath,
+        ]
+        classpath = files()  
+    }
+}
+
+task packageDistribution(type: Zip) {
+    archiveFileName = "$releaseFileName"
+    destinationDirectory = file("$projectDir/release")
+    from file("$projectDir/release/$projectName")
+}
+
+packageDistribution.doLast {
+    delete "$projectDir/release/$projectName"
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+task updateVersion(type:Copy) {
+    from "${project.rootDir}/README.md"
+    into releaseDir
+    filter(ReplaceTokens, tokens: [version: rootProject.version])
+}
+
+task createRelease(type: Copy, dependsOn: updateVersion) {
+    from jar.archiveFile
+    from file("$projectDir/libs")
+    from "${project.rootDir}/LICENSE-2.0.txt"
+    from file("$projectDir/src/fcopy")
+    from file("$projectDir/src/fcopy.bat")
+    into releaseDir
+}
+
+task cleanRelease(type: Delete) {
+    delete "$projectDir/release"
+}
+
+packageDistribution.dependsOn createRelease
+assemble.dependsOn packageDistribution
+clean.dependsOn cleanRelease
+
+task copyReadme(type: Copy, dependsOn: updateVersion) {
+    from("$releaseDir/README.md")
+    into("$projectDir/src/main/resources")
+}
+
+compileJava.dependsOn copyReadme

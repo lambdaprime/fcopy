@@ -1,0 +1,2 @@
+include 'fcopy'
+include 'fcopy.tests'

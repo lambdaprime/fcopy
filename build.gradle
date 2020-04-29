@@ -1,0 +1,11 @@
+allprojects {
+    repositories {
+        jcenter() 
+    }
+}
+
+ext {
+    version = '1'
+    projectName = 'fcopy'
+    releaseFileName = "${projectName}-${version}.zip"
+}

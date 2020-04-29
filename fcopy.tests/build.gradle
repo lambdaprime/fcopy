@@ -1,0 +1,51 @@
+/**
+ * gradle clean build
+ */
+plugins {
+    id 'java'
+}
+
+apply plugin : 'eclipse'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    testImplementation project(':fcopy')
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.4.2')
+    testImplementation('org.junit.jupiter:junit-jupiter-params:5.4.2')
+    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.4.2')
+}
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+String testDir = "$buildDir/fcopy"
+String testSrcDir = "$projectDir/src/test"
+
+// Gradle has no UnZip task so we reuse Copy for that
+task myTest(type: Copy) {
+    mkdir file(testDir)
+    from zipTree("${project.rootDir}/fcopy/release/${releaseFileName}")
+    into "$buildDir"
+}
+
+compileTestJava {
+    doFirst {
+        options.compilerArgs = [
+            '--module-path', classpath.asPath,
+        ]
+        classpath = files()
+    }
+}
+
+test {
+    useJUnitPlatform()
+    filter {
+        exclude '**/module-info.class'
+    }
+}
+
+test.dependsOn myTest
