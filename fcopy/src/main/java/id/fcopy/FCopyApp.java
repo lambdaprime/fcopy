@@ -12,7 +12,7 @@ import java.io.RandomAccessFile;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Main {
+public class FCopyApp {
 
     private static final int BLOCK_SIZE = 256_000;
     private static final int THREADS = 8;

@@ -50,11 +50,14 @@ public class BlockingExecutorService extends AbstractExecutorService {
                 XUtils.printExceptions(ex);
             } finally {
                 semaphore.release();
-                System.out.println("worker terminated");
             }
         }
     }
     
+    /**
+     * @param numOfThreads number of worker threads
+     * @param capacity size of the internal queue from which worker will pick up the tasks
+     */
     public BlockingExecutorService(int numOfThreads, int capacity) {
         this.queue = new ArrayBlockingQueue<>(capacity);
         this.semaphore = new Semaphore(numOfThreads);
