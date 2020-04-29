@@ -6,4 +6,4 @@ FCOPY_PATH=$(dirname "$FCOPY_PATH")
 # this script will only work if user pass classpath through CLASSPATH
 # and not through JAVA_ARGS
 
-java ${JAVA_ARGS} -Xnoclassgc -noverify -cp ${FCOPY_PATH}/jeval.jar:${CLASSPATH} id.fcopy.FCopyApp "$@"
+java ${JAVA_ARGS} -Xnoclassgc -noverify -cp ${FCOPY_PATH}/fcopy.jar:${CLASSPATH} id.fcopy.FCopyApp "$@"
