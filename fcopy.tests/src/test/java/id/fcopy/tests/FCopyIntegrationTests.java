@@ -52,6 +52,7 @@ public class FCopyIntegrationTests {
         test_copy_file();
         test_copy_dir();
         test_copy_file_single_thread();
+        test_copy_file_relative();
     }
 
     private void verifyMd5(String...files) throws Exception {
@@ -77,6 +78,14 @@ public class FCopyIntegrationTests {
         var out = runOk("-t 1 %s %s", TESTFILES_PATH.resolve("1.bmp"), tmpDir);
         Assertions.assertTrue(new TemplateMatcher(readResource(
                 getClass(), "test_copy_file_single_thread")).matches(out));
+        Assertions.assertEquals("b4ac928984ac0435c8b3b3661d979b88",
+            XUtils.md5Sum(tmpDir.resolve("1.bmp").toFile()));
+    }
+
+    private void test_copy_file_relative() throws Exception {
+        var out = runOk("testfiles/1.bmp %s", tmpDir);
+        Assertions.assertTrue(new TemplateMatcher(readResource(
+                getClass(), "test_copy_file")).matches(out));
         Assertions.assertEquals("b4ac928984ac0435c8b3b3661d979b88",
             XUtils.md5Sum(tmpDir.resolve("1.bmp").toFile()));
     }
