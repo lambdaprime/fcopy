@@ -51,10 +51,12 @@ public class FCopyIntegrationTests {
         test_copy_file();
     }
 
-    private void test_copy_file() {
+    private void test_copy_file() throws Exception {
         var out = runOk("%s %s", TESTFILES_PATH.resolve("1.bmp"), tmpDir);
         Assertions.assertTrue(new TemplateMatcher(readResource(
                 getClass(), "test_copy_file")).matches(out));
+        Assertions.assertEquals("b4ac928984ac0435c8b3b3661d979b88",
+            XUtils.md5Sum(tmpDir.resolve("1.bmp").toFile()));
     }
 
     private void test_no_args() throws Exception {
