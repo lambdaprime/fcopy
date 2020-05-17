@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import id.xfunction.SmartArgs;
+import id.xfunction.XUtils;
 
 public class FCopyApp {
 
@@ -89,7 +90,7 @@ public class FCopyApp {
         executor = new BlockingExecutorService(THREADS, QUEUE_SIZE);
         allocator = new MemoryBlockAllocator(BLOCK_SIZE * THREADS, BLOCK_SIZE);
         if (positionalArgs.size() < 2) {
-            System.out.println("Usage");
+            System.out.println(XUtils.readResource("README.md"));
             System.exit(1);
         }
         if (!SILENT_MODE) {

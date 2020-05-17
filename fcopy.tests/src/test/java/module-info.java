@@ -6,9 +6,10 @@
  * 
  */
 module id.fcopy.tests {
-    exports id.fcopy.tests;
+    opens id.fcopy.tests;
     
     requires id.fcopy;
+    requires id.xfunction;
     requires org.junit.jupiter.api;
     requires org.junit.jupiter.params;
 }
