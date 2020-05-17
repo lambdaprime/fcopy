@@ -17,20 +17,28 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import id.xfunction.XUtils;
 import id.xfunction.function.Unchecked;
 
+/**
+ * <p>BlockingExecutorService keeps pool of worker threads which read tasks
+ * from the blocking queue.</p>
+ * 
+ * <p>If blocking queue is bounded then thread submitting a new task to this
+ * executor will block until new space in queue became available (with standard
+ * ThreadPoolExecutor such task will be rejected).</p>
+ * 
+ */
 public class BlockingExecutorService extends AbstractExecutorService {
 
     // end of queue
     private static final Runnable EOQ = () -> {};
 
     private Semaphore semaphore;
-    private AtomicBoolean isTerminated = new AtomicBoolean(false);
+    private volatile boolean isShutdown;
     private BlockingQueue<Runnable> queue;
     private List<WorkerThread> workers;
     
@@ -55,15 +63,18 @@ public class BlockingExecutorService extends AbstractExecutorService {
     }
     
     /**
-     * @param numOfThreads number of worker threads
+     * Creates executor with bounded queue of given capacity.
+     * 
+     * @param maximumPoolSize number of worker threads which will be created and be waiting
+     * for a new tasks
      * @param capacity size of the internal queue from which worker will pick up the tasks
      */
-    public BlockingExecutorService(int numOfThreads, int capacity) {
+    public BlockingExecutorService(int maximumPoolSize, int capacity) {
         this.queue = new ArrayBlockingQueue<>(capacity);
-        this.semaphore = new Semaphore(numOfThreads);
+        this.semaphore = new Semaphore(maximumPoolSize);
         this.workers = Stream.generate(() -> new WorkerThread())
                 .peek(Thread::start)
-                .limit(numOfThreads)
+                .limit(maximumPoolSize)
                 .collect(toList());
     }
 
@@ -73,7 +84,7 @@ public class BlockingExecutorService extends AbstractExecutorService {
 
     @Override
     public void shutdown() {
-        isTerminated.set(true);
+        isShutdown = true;
         Executors.defaultThreadFactory().newThread(() -> {
             Unchecked.run(() -> queue.put(EOQ));
         }).start();
@@ -86,7 +97,7 @@ public class BlockingExecutorService extends AbstractExecutorService {
 
     @Override
     public boolean isShutdown() {
-        return isTerminated.get();
+        return isShutdown;
     }
 
     @Override
@@ -98,7 +109,7 @@ public class BlockingExecutorService extends AbstractExecutorService {
     public boolean awaitTermination(long timeout, TimeUnit unit)
             throws InterruptedException {
         boolean isTerminated = semaphore.tryAcquire(workers.size(), timeout, unit);
-        if (isTerminated) return isTerminated;
+        if (isTerminated) return true;
         return workers.stream()
                 .map(Thread::isAlive)
                 .noneMatch(Predicate.isEqual(true));
@@ -106,7 +117,7 @@ public class BlockingExecutorService extends AbstractExecutorService {
 
     @Override
     public void execute(Runnable command) {
-        if (isTerminated.get()) return;
+        if (isShutdown) return;
         Unchecked.run(() -> queue.put(command));
     }
 

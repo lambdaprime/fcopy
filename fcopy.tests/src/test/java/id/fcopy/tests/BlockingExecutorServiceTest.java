@@ -26,10 +26,14 @@ public class BlockingExecutorServiceTest {
         "100, 1, 100000",
         "100, 100, 1",
         "100, 10, 100000",
+        "1, 1, 100000",
+        "11, 1, 100000",
+        "11, 7, 100000",
+        "200, 7, 100000",
     })
     public void test_different_params(int numOfThreads, int capacity, int total) throws Exception {
         var c = new AtomicInteger();
-        var executor = new BlockingExecutorService(1,100);
+        var executor = new BlockingExecutorService(numOfThreads, capacity);
         range(0, total).forEach(i ->
             executor.submit(() -> c.incrementAndGet()));
         executor.shutdown();
