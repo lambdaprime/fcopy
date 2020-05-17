@@ -101,15 +101,13 @@ public class FCopyApp {
         }
         File src = new File(positionalArgs.get(0));
         File dst = new File(positionalArgs.get(1));
-        Path srcPath = src.toPath();
-        Path dstPath = dst.toPath();
         if (src.isFile() && dst.isDirectory()) {
             dst = new File(dst, src.getName());
         }
         try {
             executor = new BlockingExecutorService(THREADS, QUEUE_SIZE);
-            var visitor = new RecursiveCopyVisitor(srcPath, dstPath, wrapAccept(FCopyApp::copy));
-            Files.walkFileTree(srcPath, visitor);
+            var visitor = new RecursiveCopyVisitor(src.toPath(), dst.toPath(), wrapAccept(FCopyApp::copy));
+            Files.walkFileTree(src.toPath(), visitor);
         } finally {
             executor.shutdown();
             executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);

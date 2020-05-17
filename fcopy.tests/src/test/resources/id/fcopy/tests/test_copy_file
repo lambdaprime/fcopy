@@ -1,0 +1,8 @@
+Configuration:
+Threads: 11
+Queue size: 121
+Block size: 256000
+
+Copying */testfiles/1.bmp to /tmp/gggg*/1.bmp
+
+

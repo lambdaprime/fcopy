@@ -5,6 +5,7 @@
 			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="src/test/resources"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/fcopy">
 		<attributes>
 			<attribute name="module" value="true"/>

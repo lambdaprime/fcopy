@@ -29,6 +29,9 @@ public class FCopyIntegrationTests {
             .toAbsolutePath()
             .resolve("build/fcopy/fcopy")
             .toString();
+    private static final Path TESTFILES_PATH = Paths.get("")
+            .toAbsolutePath()
+            .resolve("testfiles");
     private Path tmpDir;
 
     @BeforeEach
@@ -45,6 +48,13 @@ public class FCopyIntegrationTests {
     public void test() throws Exception {
         test_no_args();
         test_copy_non_existing_file();
+        test_copy_file();
+    }
+
+    private void test_copy_file() {
+        var out = runOk("%s %s", TESTFILES_PATH.resolve("1.bmp"), tmpDir);
+        Assertions.assertTrue(new TemplateMatcher(readResource(
+                getClass(), "test_copy_file")).matches(out));
     }
 
     private void test_no_args() throws Exception {
@@ -72,7 +82,7 @@ public class FCopyIntegrationTests {
         var code = proc.getCode();
         proc.flushStdout();
         proc.flushStderr();
-        var out = proc.stdoutAsString() + "\n" + proc.stderrAsString();
+        var out = proc.stdoutAsString() + "\n" + proc.stderrAsString() + "\n";
         System.out.print(out);
         Assertions.assertEquals(expectedCode, code);
         return out;
