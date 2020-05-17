@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -41,4 +42,11 @@ public class BlockingExecutorServiceTest {
         Assertions.assertEquals(total, c.get());
     }
 
+    @Test
+    public void test_shutdown() throws Exception {
+        var executor = new BlockingExecutorService(100);
+        Thread.sleep(1000);
+        executor.shutdown();
+        executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
+    }
 }

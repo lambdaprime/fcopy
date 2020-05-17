@@ -1,0 +1,7 @@
+Configuration:
+Threads: 11
+Queue size: 121
+Block size: 256000
+
+Exception in thread "main" java.lang.RuntimeException: Failed to open fffff: fffff
+*

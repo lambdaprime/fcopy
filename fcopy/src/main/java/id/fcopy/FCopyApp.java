@@ -87,7 +87,6 @@ public class FCopyApp {
         };
         new SmartArgs(handlers, defaultHandler)
             .parse(args);
-        executor = new BlockingExecutorService(THREADS, QUEUE_SIZE);
         allocator = new MemoryBlockAllocator(BLOCK_SIZE * THREADS, BLOCK_SIZE);
         if (positionalArgs.size() < 2) {
             System.out.println(XUtils.readResource("README.md"));
@@ -107,10 +106,14 @@ public class FCopyApp {
         if (src.isFile() && dst.isDirectory()) {
             dst = new File(dst, src.getName());
         }
-        var visitor = new RecursiveCopyVisitor(srcPath, dstPath, wrapAccept(FCopyApp::copy));
-        Files.walkFileTree(srcPath, visitor);
-        executor.shutdown();
-        executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
+        try {
+            executor = new BlockingExecutorService(THREADS, QUEUE_SIZE);
+            var visitor = new RecursiveCopyVisitor(srcPath, dstPath, wrapAccept(FCopyApp::copy));
+            Files.walkFileTree(srcPath, visitor);
+        } finally {
+            executor.shutdown();
+            executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
+        }
     }
 
 }
