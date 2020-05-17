@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -49,14 +50,33 @@ public class FCopyIntegrationTests {
         test_no_args();
         test_copy_non_existing_file();
         test_copy_file();
+        test_copy_dir();
     }
 
+    private void verifyMd5(String...files) throws Exception {
+        Map<String, String> md5sums = Map.of(
+            "1.bmp", "b4ac928984ac0435c8b3b3661d979b88",
+            "2.bmp", "0f8d3023f9aa5beb20738c2b0749eaa6",
+            "3.bmp", "23bd54947300af686c8d5326120156af",
+            "4.bmp", "9f5d44346f945c3c2b73aec6b5893651");
+        for (var file: files) {
+            Assertions.assertEquals(md5sums.get(file),
+                XUtils.md5Sum(tmpDir.resolve(file).toFile()));
+        }
+    }
+    
     private void test_copy_file() throws Exception {
         var out = runOk("%s %s", TESTFILES_PATH.resolve("1.bmp"), tmpDir);
         Assertions.assertTrue(new TemplateMatcher(readResource(
                 getClass(), "test_copy_file")).matches(out));
-        Assertions.assertEquals("b4ac928984ac0435c8b3b3661d979b88",
-            XUtils.md5Sum(tmpDir.resolve("1.bmp").toFile()));
+        verifyMd5("1.bmp");
+    }
+
+    private void test_copy_dir() throws Exception {
+        var out = runOk("%s %s", TESTFILES_PATH, tmpDir);
+        Assertions.assertTrue(new TemplateMatcher(readResource(
+                getClass(), "test_copy_dir")).matches(out));
+        verifyMd5("1.bmp", "2.bmp", "3.bmp", "4.bmp");
     }
 
     private void test_no_args() throws Exception {
