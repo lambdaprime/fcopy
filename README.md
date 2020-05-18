@@ -2,8 +2,6 @@
 
 At that moment **fcopy** does not suport data integrity verification after the files were copied. Please use md5sum/crcsum if needed. **fcopy** relies on Java IO and if it does not throw an exception then **fcopy** considers data as being written to the disk without any corruptions.
 
-Version: @version@
-
 lambdaprime <id.blackmesa@gmail.com>
 
 # Download
@@ -16,7 +14,7 @@ Java 11
 
 # Usage
 
-```bash
+```
 fcopy [ -bs BLOCK_SIZE | -t NUMBER_OF_THREADS | -c QUEUE_CAPACITY ] SRC DST
 ```
 
@@ -26,13 +24,25 @@ BLOCK_SIZE - when **fcopy** reads and writes data it does it in blocks of given 
 
 NUMBER_OF_THREADS - number of worker threads which will copy the data in parallel (default is number of cores in the system)
 
-QUEUE_CAPACITY - size of internal queue from which worker threads pick up the blocks they need to copy (default is NUMBER_OF_THREADS^2)
+QUEUE_CAPACITY - size of internal queue from which worker threads pick upcop the blocks they need to copy (default is NUMBER_OF_THREADS^2)
 
 SRC - source which may be either file or directory. In case of directory **fcopy** will copy all content of it recursively
 
 DST - destination which may be either file or directory depending from the SRC you use
 
 # Examples
+
+Copy ~/test file to /tmp directory:
+
+``` bash
+% fcopy ~/test /tmp
+Configuration:
+Threads: 11
+Queue size: 121
+Block size: 256000
+
+Copying /home/ubuntu/test to /tmp/test
+```
 
 # Measurements
 
@@ -195,7 +205,7 @@ sys 5.02
 ### cp
 
 ``` bash
-time -p cp -rf ubuntu /tmp/l
+% time -p cp -rf ubuntu /tmp/l
 real 5.87
 user 0.04
 sys 3.55
