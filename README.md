@@ -15,20 +15,24 @@ Java 11
 # Usage
 
 ```
-fcopy [ -bs BLOCK_SIZE | -t NUMBER_OF_THREADS | -c QUEUE_CAPACITY ] SRC DST
+fcopy [ OPTION ]... SRC DST
 ```
 
 Where:
 
-BLOCK_SIZE - when **fcopy** reads and writes data it does it in blocks of given size in bytes (default is 256K as the most popular among SSD drives)
-
-NUMBER_OF_THREADS - number of worker threads which will copy the data in parallel (default is number of cores in the system)
-
-QUEUE_CAPACITY - size of internal queue from which worker threads pick upcop the blocks they need to copy (default is NUMBER_OF_THREADS^2)
-
 SRC - source which may be either file or directory. In case of directory **fcopy** will copy all content of it recursively
 
 DST - destination which may be either file or directory depending from the SRC you use
+
+Options:
+
+-bs BLOCK_SIZE - when **fcopy** reads and writes data it does it in blocks of given size in bytes (default is 256K as the most popular among SSD drives)
+
+-t NUMBER_OF_THREADS - number of worker threads which will copy the data in parallel (default is number of cores in the system)
+
+-c QUEUE_CAPACITY - size of internal queue from which worker threads pick up the blocks they need to copy (default is NUMBER_OF_THREADS^2)
+
+-s - enables silent mode
 
 # Examples
 
